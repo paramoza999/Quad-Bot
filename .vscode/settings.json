@@ -1,0 +1,36 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/param/new_ws/build/rl",
+        "/home/param/new_ws/install/rl/lib/python3.10/site-packages",
+        "/home/param/new_ws/build/quad",
+        "/home/param/new_ws/install/quad/lib/python3.10/site-packages",
+        "/home/param/new_ws/build/pkg1",
+        "/home/param/new_ws/install/pkg1/lib/python3.10/site-packages",
+        "/home/param/new_ws/install/p1/lib/python3.10/site-packages",
+        "/home/param/new_ws/install/hyperdog_ctrl/lib/python3.10/site-packages",
+        "/home/param/new_ws/install/hyperdog_msgs/local/lib/python3.10/dist-packages",
+        "/home/param/new_ws/install/hyperdog_launch/lib/python3.10/site-packages",
+        "/home/param/ros2_ws/build/my_py_pkg",
+        "/home/param/ros2_ws/install/my_py_pkg/lib/python3.10/site-packages",
+        "/home/param/ros2_ws/install/gazebo_msgs/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/param/new_ws/build/rl",
+        "/home/param/new_ws/install/rl/lib/python3.10/site-packages",
+        "/home/param/new_ws/build/quad",
+        "/home/param/new_ws/install/quad/lib/python3.10/site-packages",
+        "/home/param/new_ws/build/pkg1",
+        "/home/param/new_ws/install/pkg1/lib/python3.10/site-packages",
+        "/home/param/new_ws/install/p1/lib/python3.10/site-packages",
+        "/home/param/new_ws/install/hyperdog_ctrl/lib/python3.10/site-packages",
+        "/home/param/new_ws/install/hyperdog_msgs/local/lib/python3.10/dist-packages",
+        "/home/param/new_ws/install/hyperdog_launch/lib/python3.10/site-packages",
+        "/home/param/ros2_ws/build/my_py_pkg",
+        "/home/param/ros2_ws/install/my_py_pkg/lib/python3.10/site-packages",
+        "/home/param/ros2_ws/install/gazebo_msgs/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ]
+}
