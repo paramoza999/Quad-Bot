@@ -33,4 +33,12 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}
 )
 
+
+install(
+  PROGRAMS
+    src/rl_agent.py
+    
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
