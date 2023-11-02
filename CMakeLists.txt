@@ -19,7 +19,6 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(hyperdog_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 
 
@@ -36,7 +35,7 @@ install(DIRECTORY
 
 install(
   PROGRAMS
-    src/rl_agent.py
+    src/dyn_pos.py
     
   DESTINATION lib/${PROJECT_NAME}
 )

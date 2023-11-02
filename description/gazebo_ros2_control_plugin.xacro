@@ -1,17 +1,9 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:arg name="imu_visual"    default="false"/>
+
+
     
-<!-- ************* JOINT CONTROLLER GAZEBO PLUGIN ************** -->
-
-    <!-- 
-    _____________________________________________________________________
-        include this file into: /description/hyperdog.urdf.xacro 
-        using following line: 
-                    <xacro:include filename="gazebo_ros2_control_plugin.xacro" /> 
-    _____________________________________________________________________ -->
-
-
+    
 
     <!-- CONFIGURE JOINTS OF THE ROBOT -->
     <ros2_control name="GazeboSystem" type="System">
