@@ -10,6 +10,9 @@
 
     <xacro:include filename="consts.xacro" /> 
 
+
+    
+
     <!-- Limits -->
     <xacro:macro name="hip_limits">
         <limit lower="${hip_low_limit}" upper="${hip_up_limit}" velocity="${velocity}" effort="${effort}"/> <!-- effort = 7 -->
@@ -167,7 +170,6 @@
             <xacro:lleg_joint_dynamics></xacro:lleg_joint_dynamics>
         </xacro:if>
     </joint>
-
 
 
      <!-- *********  FR_FOOT  ********* -->

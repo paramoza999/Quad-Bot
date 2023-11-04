@@ -35,9 +35,30 @@ install(DIRECTORY
 
 install(
   PROGRAMS
-    src/dyn_pos.py
+    src/rl.py
     
   DESTINATION lib/${PROJECT_NAME}
 )
+
+
+install(
+  PROGRAMS
+    src/dyn_pos.py
+    
+  DESTINATION lib/${PROJECT_NAME}
+
+
+)
+
+install(
+  PROGRAMS
+    src/test.py
+    
+  DESTINATION lib/${PROJECT_NAME}
+
+
+)
+
+
 
 ament_package()
