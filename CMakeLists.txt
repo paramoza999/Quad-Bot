@@ -54,10 +54,22 @@ install(
   PROGRAMS
     src/test.py
     
-  DESTINATION lib/${PROJECT_NAME}
+  DESTINATION lib/${PROJECT_NAME})
 
+install(
+    PROGRAMS
+      src/rl1.py
+      
+    DESTINATION lib/${PROJECT_NAME}
+  )
 
-)
+install(
+    PROGRAMS
+      src/com.py
+      
+    DESTINATION lib/${PROJECT_NAME}
+  )
+
 
 
 

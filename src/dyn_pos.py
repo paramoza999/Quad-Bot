@@ -18,13 +18,11 @@ class JointPositionListener(Node):
             10
         )
         self.imu_sub = self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
-        self.imu_sub = self.create_subscription(Image, '/camera/image_raw', self.image_callback, 10)
-
         self.publisher = self.create_publisher(Float64MultiArray, '/gazebo_joint_controller/commands', 10)
 
     def listener_callback(self, msg):
         # Log joint names and positions
-        self.get_logger().info('Joint Names: %s' % msg.name)
+    
         self.get_logger().info('Joint Positions: %s' % msg.position)
         self.get_logger().info('Joint Velocities: %s' % msg.velocity)
         self.get_logger().info('Joint efforts: %s' % msg.effort)
