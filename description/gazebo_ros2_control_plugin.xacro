@@ -12,6 +12,8 @@
         </hardware>
 
         <joint name="FR_hip_joint">
+            <limit  velocity="3" effort="3"/> <!-- effort = 7 -->
+
             <command_interface name="position">
                 <param name="min">-1.57</param>
                 <param name="max">1.57</param>
@@ -24,6 +26,7 @@
         </joint>
 
         <joint name="FR_uleg_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">-1.2217</param>
                 <param name="max">3.14</param>
@@ -36,6 +39,7 @@
         </joint>
 
         <joint name="FR_lleg_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">0.45</param>
                 <param name="max">2.3562</param>
@@ -48,6 +52,7 @@
         </joint>
 
         <joint name="FL_hip_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">-1.57</param>
                 <param name="max">1.57</param>
@@ -60,6 +65,7 @@
         </joint>
 
         <joint name="FL_uleg_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">-1.2217</param>
                 <param name="max">3.14</param>
@@ -72,6 +78,7 @@
         </joint>
         
         <joint name="FL_lleg_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">0.45</param>
                 <param name="max">2.3562</param>
@@ -84,6 +91,7 @@
         </joint>
 
         <joint name="BR_hip_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">-1.57</param>
                 <param name="max">1.57</param>
@@ -96,6 +104,7 @@
         </joint>
 
         <joint name="BR_uleg_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">-1.2217</param>
                 <param name="max">3.14</param>
@@ -108,6 +117,7 @@
         </joint>
 
         <joint name="BR_lleg_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">0.45</param>
                 <param name="max">2.3562</param>
@@ -120,6 +130,7 @@
         </joint>
 
         <joint name="BL_hip_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">-1.57</param>
                 <param name="max">1.57</param>
@@ -132,6 +143,7 @@
         </joint>
 
         <joint name="BL_uleg_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">-1.2217</param>
                 <param name="max">3.14</param>
@@ -144,6 +156,7 @@
         </joint>
 
         <joint name="BL_lleg_joint">
+            <limit  velocity="3" effort="3"/>
             <command_interface name="position">
                 <param name="min">0.45</param>
                 <param name="max">2.3562</param>

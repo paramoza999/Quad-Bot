@@ -1,6 +1,6 @@
 controller_manager:
   ros__parameters:
-    update_rate: 100 #  Hz
+    update_rate: 50 #  Hz
 
     joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
@@ -33,3 +33,7 @@ gazebo_joint_controller:
       - position
       - velocity
       - effort
+
+
+
+    

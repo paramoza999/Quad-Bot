@@ -33,22 +33,9 @@ install(DIRECTORY
 )
 
 
-install(
-  PROGRAMS
-    src/rl.py
-    
-  DESTINATION lib/${PROJECT_NAME}
-)
 
 
-install(
-  PROGRAMS
-    src/dyn_pos.py
-    
-  DESTINATION lib/${PROJECT_NAME}
 
-
-)
 
 install(
   PROGRAMS
@@ -56,16 +43,36 @@ install(
     
   DESTINATION lib/${PROJECT_NAME})
 
-install(
-    PROGRAMS
-      src/rl1.py
-      
-    DESTINATION lib/${PROJECT_NAME}
-  )
 
 install(
     PROGRAMS
       src/com.py
+      
+    DESTINATION lib/${PROJECT_NAME}
+  )
+
+
+install(
+    PROGRAMS
+      src/rl_2layer.py
+      
+    DESTINATION lib/${PROJECT_NAME}
+  )
+install(
+    PROGRAMS
+      src/rl_4layer.py
+      
+    DESTINATION lib/${PROJECT_NAME}
+  )
+install(
+    PROGRAMS
+      src/rl_7layer.py
+      
+    DESTINATION lib/${PROJECT_NAME}
+  )
+install(
+    PROGRAMS
+      src/rl_10layer.py
       
     DESTINATION lib/${PROJECT_NAME}
   )
