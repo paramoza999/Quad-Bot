@@ -21,7 +21,7 @@ class xy(Node):
 
         #self.combined_data_sub = self.create_subscription(LaserScan, '/scan',self.x_callback, 10)
         
-        # self.publisher = self.create_publisher(Float64MultiArray, '/gazebo_joint_controller/commands', 10)
+        self.publisher = self.create_publisher(Float64MultiArray, '/gazebo_joint_controller/commands', 10)
         
        
         self.combined_data_sub1 = self.create_subscription(Float64MultiArray, '/combined_data1',self.x_callback, 10)
@@ -33,19 +33,23 @@ class xy(Node):
 
     def x_callback(self,msg):
         
-        # self.state=Float64MultiArray()
-        # self.state=[]
-        # self.state=msg.data
+        self.state=Float64MultiArray()
+        self.state=[]
+        self.state=msg.data
         # # self.get_logger().info('Combined Sensor Data state data: %s' % self.state)
-        # self.subset_data = msg.data[0:12]
-        # action = [pos + 0.01 for pos in self.subset_data]
-        # command_msg = Float64MultiArray()
-        # command_msg.data = action
-        # self.publisher.publish(command_msg)
+        self.subset_data = msg.data[0:12]
+        action = [pos + 0.005 for pos in self.subset_data]
+        command_msg = Float64MultiArray()
+        command_msg.data = action
+        self.publisher.publish(command_msg)
+        current_time = time.time()
+        if current_time - self.last_print_time >=0.75:
+         self.get_logger().info('Acceleration x,y: %.3f, %.3f' % (msg.data[36], msg.data[37]))
+         self.get_logger().info('V x+y: %.3f' % ( msg.data[46]))
 
-        #self.final_data =[value if math.isfinite(value) and value < 12.0 else 50 for value in msg.ranges[0:180]]
-        self.get_logger().info('pole: %s' % msg.data[36:51])
+         self.get_logger().info('P x+y: %.3f' % (msg.data[47]))
 
+         self.last_print_time = current_time
             
 
         # current_time = time.time()

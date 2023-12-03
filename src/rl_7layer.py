@@ -45,6 +45,14 @@ class SAC(Node):
         self.agent = Agent() 
         self.load_checkpoint =False
         self.new_session = True 
+        self.velocity_x = 0.0
+        self.velocity_y = 0.0
+        self.healthy=False
+        self.x=0.0
+        self.previous_dist=0.0
+        self.count=0
+
+        
 
         
  
@@ -63,10 +71,10 @@ class SAC(Node):
         
         
     def x_callback(self, msg):        # if self.load_checkpoint:
-        #       self.agent.load_models()
-        # if self.new_session==True:
-        #       self.agent.load_models()
-        #       self.new_session = False 
+               
+        if self.new_session==True:
+                 self.agent.load_models()
+                 self.new_session = False 
 
 
         dt=0.001
@@ -100,7 +108,7 @@ class SAC(Node):
         derivative_output = kd * derivative_error
 
         # Integral Controller
-        ki = 0.0000027 # Adjust the integral gain as needed
+        ki = 0.000003 # Adjust the integral gain as needed
         if not hasattr(self, 'integral'):
             self.integral = T.zeros_like(self.error)
         self.integral += self.error
@@ -119,6 +127,13 @@ class SAC(Node):
         # Save the current error for the next iteration
         self.previous_error = self.error.clone().detach()
 
+
+
+
+
+
+
+
     def y_callback(self,msg):
         
         orientation_data = msg.data[42:46]  # Assuming orientation data is in msg.data[42:46]
@@ -127,139 +142,74 @@ class SAC(Node):
         euler_angles = quat2euler(orientation_data)
         # self.get_logger().info(f'Euler Angles: {euler_angles}')
 
-        if(self.reward<-14000):
-            self.reward=0
-            self.agent.save_models()
-            # new_pose = Pose()
-            # new_pose.orientation.x = 0.001
-            # new_pose.orientation.y = 0.001
         
-            # new_pose.orientation.w = 0.1 # set the new quaternion orientation
-            # request = SetEntityState.Request()
-            # request.state.name = 'hyperdog'
-            # request.state.pose = new_pose
 
-            # self.set_entity_state_client.call_async(request)
-          
+        
+
+        if self.reward < -500:
+            self.reward = 0
+
+#----------------------------------------------------------------------------------
+
+  
        
-            # request = DeleteEntity.Request()
-            # entity_name="hyperdog"
-            # request.name = entity_name
-            # self.delete_entity_client.call_async(request)
-
-            # request1 = SpawnEntity.Request()
-            
-            # request1.name = entity_name
-            # pkg_name = 'p5'
-            # file_subpath = 'description/hyperdog.urdf.xacro'
-            # xacro_file = os.path.join(get_package_share_directory(pkg_name),file_subpath)
-            # robot_description_raw = xacro.process_file(xacro_file).toxml()
-            # request1.xml=robot_description_raw
-            # self.spawn_entity_client.call_async(request1)
-            # self.agent.load_models()
-            # rclpy.spin_until_future_complete(self.node, future)
-            # if future.result() is not None:
-            #     self.node.get_logger().info(f'Deleted entity: {entity_name}')
-            # else:
-            #     self.node.get_logger().error(f'Failed to delete entity: {entity_name}')
-            
-
-
-
-        #if linear_acc.z<7, reduce rewards
-        if(msg.data[38]<8.5):
-            self.reward-=10
-
-        if (any(value > 8 for value in msg.data[12:23]) and self.iteration != 100000):
-            self.reward -= 10
-        
-        else:
-            self.reward+=1
-
+ #-------------------------------------------------------------------
+        #if linear_acc.x and linear.acc.y too high, reduce rewards
+        # if(msg.data[36]>20 or msg.data[37]>20 or msg.data[37]<-20 or msg.data[36]<-20):
+        #     self.reward-=0.1
 
         
-        #if orientation rewards for pitch
-        if(euler_angles[1]>=0 and euler_angles[1]<=0.6 or (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or (euler_angles[2]<=3 and euler_angles[2]>=2.3))):
-            self.reward+=1
-        else:
-            self.reward-=4
-
 
         #penalize high angular velocity
-        if(msg.data[39]>7 or msg.data[40]>7 or msg.data[41]>7):
-            self.reward-=10
-        
+        # if(msg.data[39]>20 or msg.data[40]>20 or msg.data[41]>20 and self.reward<150):
+        #     self.reward-=0.1
+        if(msg.data[46]<3):
+            self.count+=1
+            self.reward-=self.count
         else:
+            self.count=0
+
+         #if orientation rewards for pitch
+        if(euler_angles[1]>=0 and euler_angles[1]<=0.6 or (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or (euler_angles[2]<=3 and euler_angles[2]>=2.3 and msg.data[46]>3 and msg.data[46]<25))):
+            self.reward+=1
+        else:
+            self.reward-=1
+
+#-----
+        if((msg.data[48:228]==100.0 and msg.data[46]>3 and msg.data[46]<20)):
             self.reward+=1
 
-        
-        #if linear_acc.x and linear.acc.y<1, reduce rewards
-        if(msg.data[36]<2.0 and msg.data[37]<2.0):
-            self.reward-=5
-      
-          
+         
+        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
+           and (msg.data[6]>=-0.4 and  msg.data[6]<=0.7) 
+           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
+           and (msg.data[9]>=-0.4 and  msg.data[9]<=0.7)
+           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
+           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
+           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
+           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
+           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
+           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
+           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
+           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
 
-        #if linear_acc.x and linear.acc.y too high, reduce rewards
-        if(msg.data[36]>25 or msg.data[37]>25):
-            self.reward-=20
+           and (euler_angles[1]>=0 and euler_angles[1]<=0.6 or 
+          (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and 
+          ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
+           (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
 
-        
+           and (msg.data[46]<20.0 and msg.data[46]>0.4 )):
+             self.reward+=1
         
      
 
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-            and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-            and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-            and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-            and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-            and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-            and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-            and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-            and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-            and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-            and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-            and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-            and (msg.data[36]>0.4)):
-              self.reward+=1
+        
+
 
         if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
+           and (msg.data[6]>=-0.4 and  msg.data[6]<=0.7) 
            and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-
-           and (msg.data[36]>1.0 )):
-             self.reward+=5
-
- 
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-
-           and (msg.data[36]>3.0 )):
-             self.reward+=10
-
-             
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
+           and (msg.data[9]>=-0.4 and  msg.data[9]<=0.7)
            and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
            and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
            and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
@@ -274,199 +224,114 @@ class SAC(Node):
           ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
            (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
 
-           and (msg.data[36]>8.0 )):
-             self.reward+=300
+           and (msg.data[46]>0 and msg.data[46]<20)):
+             self.healthy=True
+        
+        if(self.healthy==True):
+            self.reward+=(2*(msg.data(47)-self.previous_dist))
+            self.previous_dist=msg.data(47)
+        
+        
+
+        
+        self.reward=self.reward
+#--------------------------------------------------------------------------------
+        # if(self.reward>10):
+        #     self.reward+=(0.1*msg.data[47])
+
+
+#-----------------------------------------------------------------------------------  
+        
+        #reward for lidar distances
+        # if (sum(value < 100.0 for value in msg.data[48:228])<=17 and sum(value < 100.0 for value in msg.data[48:228]) >=1):
+        #     self.pole = True
+        #     self.pole_values = [value for value in msg.data[48:228] if value < 12.0]
+
+        # else:
+        #     self.pole=False
+        
+        # if(self.pole==True):
+        #     self.reward+=(3*1/(sum(self.pole_values)+1))
+      
+        
+        
+
+        # if(self.pole==False and msg.data[46]>2):
+        #     msg_array = np.array(msg.data[48:228])
+        #     previous_array = np.array(self.previous_lidar_data)
+
+        #     # Perform element-wise subtraction
+        #     self.x = np.sum(msg_array - previous_array)
+
+        #     # Update previous_lidar_data
+        #     self.previous_lidar_data = msg.data[48:228]
+
+        #     # Update reward
+        #     if self.x != 0:  # Avoid division by zero
+        #         self.reward += 0.2 * (1 / self.x + 0.1)
+
+    #-----------------------------------------------------------------------------    
+        
 
       
+        if self.iteration%1000==0:
+            self.agent.save_models()
+         
+       
+      
 
-        if((msg.data[0]>=0.2 and  msg.data[0]<=0.4) 
-           and (msg.data[6]>=0.2 and  msg.data[0]<=0.4)
-           and (msg.data[3]>=0.2 and  msg.data[3]<=0.4)
-           and (msg.data[9]>=0.2 and  msg.data[3]<=0.4)
-           and (msg.data[1]>=1.0 and  msg.data[1]<=1.4)
-           and (msg.data[4]>=1.0  and  msg.data[4]<=1.4)
-           and (msg.data[7]>=1.0  and  msg.data[7]<=1.4)
-           and (msg.data[10]>=1.0  and msg.data[10]<=1.4)
-           and (msg.data[2]>=1.2 and  msg.data[2]<=1.6)
-           and (msg.data[5]>=1.2 and  msg.data[5]<=1.6)
-           and (msg.data[8]>=1.2 and  msg.data[8]<=1.6)
-           and (msg.data[11]>=1.2 and msg.data[11]<=1.6)
-
-           and (euler_angles[1]>=0 and euler_angles[1]<=0.6 or 
-          (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and 
-          ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
-           (euler_angles[2]<=3 and euler_angles[2]>=2.3)))):
-                self.reward+=2
-
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-
-           and (euler_angles[1]>=0 and euler_angles[1]<=0.6 or 
-          (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and 
-          ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
-           (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
-
-           and (msg.data[36]>4.0 )):
-             self.reward+=100
-
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-
-           and (euler_angles[1]>=0 and euler_angles[1]<=0.6 or 
-          (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and 
-          ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
-           (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
-
-           and (msg.data[36]>2 )):
-             self.reward+=12
-
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-
-           and (euler_angles[1]>=0 and euler_angles[1]<=0.6 or 
-          (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and 
-          ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
-           (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
-
-           and (msg.data[36]>1)):
-             self.reward+=3
-
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-
-           and (euler_angles[1]>=0 and euler_angles[1]<=0.6 or 
-          (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and 
-          ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
-           (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
-
-           and (msg.data[36]<0.8)):
-             self.reward-=5
 
         
-           
-             
-
-        
-
-        
-
-        
-
-
-
-        # if(msg.data[3]>=-0.4 and  msg.data[3]<=0.7 and (msg.data[36]>2.0 or msg.data[37]>2.0)):
-        #     self.reward+=5
-
-        # if(msg.data[6]>=-0.4 and  msg.data[0]<=0.7 and (msg.data[36]>2.0 or msg.data[37]>2.0)):
-        #     self.reward+=5
-
-        # if(msg.data[9]>=-0.4 and  msg.data[3]<=0.7 and (msg.data[36]>2.0 or msg.data[37]>2.0)):
-        #     self.reward+=5
-        
-        
-        # if(msg.data[1]>=0.2 and  msg.data[1]<=2.2 and (msg.data[36]>2.0 or msg.data[37]>2.0)):
-        #     self.reward+=5
-        
-        # if(msg.data[4]>=0.2 and  msg.data[4]<=2.2 and (msg.data[36]>2.0 or msg.data[37]>2.0)):
-        #     self.reward+=5
-
-        # if(msg.data[7]>=0.2 and  msg.data[7]<=2.2 and (msg.data[36]>2.0 or msg.data[37]>2.0) ):
-        #     self.reward+=5
-        
-        # if(msg.data[10]>=0.2 and  msg.data[10]<=2.2 and (msg.data[36]>2.0 or msg.data[37]>2.0) ):
-        #     self.reward+=5
-        
-        
-
-        # if(msg.data[2]>=0.5 and  msg.data[2]<=2.0 and (msg.data[36]>2.0 or msg.data[37]>2.0) ):
-        #     self.reward+=5
-        
-        # if(msg.data[5]>=0.5 and  msg.data[5]<=2.0 and (msg.data[36]>2.0 or msg.data[37]>2.0) ):
-        #     self.reward+=5
-        
-        # if(msg.data[8]>=0.5 and  msg.data[8]<=2.0 and (msg.data[36]>2.0 or msg.data[37]>2.0) ):
-        #     self.reward+=5
-
-        # if(msg.data[11]>=0.5 and  msg.data[11]<=2.0 and (msg.data[36]>2.0 or msg.data[37]>2.0) ):
-        #     self.reward+=5
-        
-        
-
+#----------------------------------------------------------------------------------------
             
        
         self.next_state = msg.data
         current_time = time.time()
-        if current_time - self.last_print_time >= 5.0:
-            self.get_logger().info('Combined Sensor Data state data: %s' % self.current_state)
-            self.get_logger().info('Action values: %s' % self.action)
-            self.get_logger().info('Reward values: %s' % self.reward)
-            self.get_logger().info('Iteration values: %s' % self.iteration)
+        if current_time - self.last_print_time >= 1.0:
+            #self.get_logger().info('Combined Sensor Data state data: %s' % self.current_state)
+            # self.get_logger().info('state values: %s' % msg.data[0:45])
+            self.get_logger().info('State values: %s' % self.next_state[0:12])
+            
+            self.get_logger().info('Action Values:%s' %self.action)
+            
             self.get_logger().info('Session_info: %s' % self.new_session)
+            if (isinstance(self.agent.a_loss, T.Tensor)and isinstance(self.agent.c_loss, T.Tensor)):
+             self.get_logger().info('Actor loss: %s' % self.agent.a_loss.item())
+             self.get_logger().info('Critic loss: %s' % self.agent.c_loss.item())
+            else:
+             self.get_logger().info('Actor loss: %s' % self.agent.a_loss)
+             self.get_logger().info('Critic loss: %s' % self.agent.c_loss)
+            self.get_logger().info('Reward values: %s' % self.reward)
+            self.get_logger().info('Velocity:%s' %msg.data[46])
+            self.get_logger().info('Iteration values: %s' % self.iteration)
+             
+            
+      
             self.last_print_time = current_time
 
         self.next_state = T.tensor(msg.data, dtype=T.float)
         self.agent.remember(self.state, self.action, self.reward, self.next_state, done=False)
-        if not self.load_checkpoint:
-            self.agent.learn()
-       
-
-        if self.iteration%1000==0:
-            self.agent.save_models()
-         
+        # if not self.load_checkpoint:
+        self.agent.learn()
+        
+ 
             
 
 
 
 
 class Agent():
-    def __init__(self, alpha=0.00005, beta=0.00007,input_dims=[46],
-            env=None, gamma=0.69, n_actions=12, max_size=10000000, tau=0.005,
-            layer1_size=256, layer2_size=256, batch_size=512, reward_scale=0.7):
+    def __init__(self, alpha=0.0003, beta=0.0003,input_dims=[228],
+            env=None, gamma=0.99, n_actions=12, max_size=1000000, tau=0.005,
+            layer1_size=256, layer2_size=256, batch_size=512, reward_scale=20):
         self.gamma = gamma
         self.tau = tau
         self.memory = ReplayBuffer(max_size, input_dims, n_actions)
         self.batch_size = batch_size
         self.n_actions = n_actions
+        self.c_loss=0.0
+        self.a_loss=0.0
+      
 
         self.actor = ActorNetwork(alpha, input_dims, n_actions=n_actions,
                     name='actor')
@@ -488,16 +353,21 @@ class Agent():
 
         actions, _ = self.actor.sample_normal(state, reparameterize=False)
 
-        lower_limits = T.tensor([[-1.57, -1.0, 0.45, -1.57, -1.0, 0.45, -1.57, -1.0, 0.45, -1.57, -1.0, 0.45]])
+        lower_limits = T.tensor([[-1.57, -1.2, 0.45, -1.57, -1.2, 0.45, -1.57, -1.2, 0.45, -1.57, -1.2, 0.45]])
         upper_limits = T.tensor([[1.57, 3.14, 2.35, 1.57, 3.14, 2.35, 1.57, 3.14, 2.35, 1.57, 3.14, 2.35]])
 
         # Move the limits tensors to the same device as actions
         lower_limits = lower_limits.to(actions.device)
         upper_limits = upper_limits.to(actions.device)
 
-        # actions = T.tanh(actions)
-        # actions = T.clamp(actions, -1.57, 3.14)
-        actions = actions * (upper_limits - lower_limits) / 2.0 + (upper_limits + lower_limits) / 2.0
+        for i in range(actions.size(0)):
+        # Scale each joint independently while respecting the specified limits
+         actions[i] = (((actions[i] + 1) * (upper_limits[0, i] - lower_limits[0, i])) / 2 + lower_limits[0, i])
+        #actions = T.max(T.min(actions, upper_limits), lower_limits)
+
+        
+
+        #tions = actions * (upper_limits - lower_limits) / 2.0 + (upper_limits + lower_limits) / 2.0
         return actions.cpu().detach().numpy()
 
     def remember(self, state, action, reward, new_state, done):
@@ -589,6 +459,8 @@ class Agent():
         critic_2_loss = 0.5 * F.mse_loss(q2_old_policy, q_hat)
 
         critic_loss = critic_1_loss + critic_2_loss
+        self.a_loss=actor_loss
+        self.c_loss=critic_loss
         critic_loss.backward()
        
         self.critic_1.optimizer.step()
@@ -662,7 +534,8 @@ class CriticNetwork(nn.Module):
         self.fc5 = nn.Linear(self.fc4_dims, self.fc5_dims)
         self.fc6 = nn.Linear(self.fc5_dims, self.fc6_dims)
         self.fc7 = nn.Linear(self.fc6_dims, self.fc7_dims)
-      
+        self.q = nn.Linear(self.fc7_dims, 1)
+
  
 
         self.optimizer = optim.Adam(self.parameters(), lr=beta)
@@ -831,10 +704,12 @@ class ActorNetwork(nn.Module):
             actions = probabilities.sample()
 
         action = T.tanh(actions).to(self.device)
+
         log_probs = probabilities.log_prob(actions)
         log_probs -= T.log(1-action.pow(2)+self.reparam_noise)
         log_probs = log_probs.sum(-1, keepdim=True)
 
+        return action, log_probs
         return action, log_probs
 
     def save_checkpoint(self):

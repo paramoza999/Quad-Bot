@@ -1,11 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:property name="r200_cam_rgb_px" value="0.005"/>
-    <xacro:property name="r200_cam_rgb_py" value="0.018"/>
-    <xacro:property name="r200_cam_rgb_pz" value="0.013"/>
-    <xacro:property name="r200_cam_depth_offset" value="0.01"/>
-
 <!-- 
     * Autor: nipun.dhananjaya@gmail.com
     * Date:  13.03.2023
@@ -69,14 +64,14 @@
         
     </link>
 
-
     <joint name="imu_joint" type="fixed">
         <parent link="base_link"/>
         <child link="imu_link"/>
         <origin xyz="0.0 0 0.068" rpy="0 0 0"/>
       </joint>
     
-      <link name="imu_link"/>
+    <link name="imu_link"/>
+
 
 
     <!-- !!!!!!!!!!!!!!!!!!!!!!! HIPS !!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
@@ -93,6 +88,15 @@
             </material> 
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:rightHip_mesh></xacro:rightHip_mesh>
@@ -112,6 +116,15 @@
             </material> 
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:leftHip_mesh></xacro:leftHip_mesh>
@@ -132,7 +145,25 @@
         </visual>
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <geometry>
+                 <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
                 <xacro:rightHip_mesh></xacro:rightHip_mesh>
             </geometry>
         </collision>
@@ -150,6 +181,15 @@
             </material> 
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:leftHip_mesh></xacro:leftHip_mesh>
@@ -173,6 +213,15 @@
             </material> 
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:rightUleg_mesh></xacro:rightUleg_mesh>
@@ -192,6 +241,15 @@
             </material>
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:leftUleg_mesh></xacro:leftUleg_mesh>
@@ -211,6 +269,15 @@
             </material>
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:rightUleg_mesh></xacro:rightUleg_mesh>
@@ -230,6 +297,15 @@
             </material>
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:leftUleg_mesh></xacro:leftUleg_mesh>
@@ -253,6 +329,15 @@
             </material> 
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:lleg_mesh></xacro:lleg_mesh>
@@ -272,6 +357,15 @@
             </material> 
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:lleg_mesh></xacro:lleg_mesh>
@@ -292,6 +386,15 @@
             </material> 
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:lleg_mesh></xacro:lleg_mesh>
@@ -312,6 +415,15 @@
             </material> 
         </visual>
         <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.7</mu>
+                        <mu2>0.7</mu2>
+                        <fdir1>1 0 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <xacro:lleg_mesh></xacro:lleg_mesh>
@@ -428,9 +540,5 @@
         </collision>
         <xacro:inertial_foot></xacro:inertial_foot>
       </link>
-    
-      
-      
 
-    
 </robot>

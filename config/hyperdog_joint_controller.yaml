@@ -14,6 +14,9 @@ controller_manager:
 gazebo_joint_controller:
   ros__parameters:
     joints:
+      - BL_hip_joint
+      - BL_uleg_joint
+      - BL_lleg_joint
       - FR_hip_joint
       - FR_uleg_joint
       - FR_lleg_joint
@@ -23,9 +26,8 @@ gazebo_joint_controller:
       - BR_hip_joint
       - BR_uleg_joint
       - BR_lleg_joint
-      - BL_hip_joint
-      - BL_uleg_joint
-      - BL_lleg_joint
+ 
+      
     interface_name: position
     command_interfaces:
       - position 

@@ -48,6 +48,8 @@ class SAC(Node):
         self.velocity_x = 0.0
         self.velocity_y = 0.0
 
+        self.x=0.0
+
         
 
         
@@ -67,10 +69,10 @@ class SAC(Node):
         
         
     def x_callback(self, msg):        # if self.load_checkpoint:
-        #       self.agent.load_models()
+               
         if self.new_session==True:
-              self.agent.load_models()
-              self.new_session = False 
+               self.agent.load_models()
+               self.new_session = False 
 
 
         dt=0.001
@@ -94,7 +96,7 @@ class SAC(Node):
         command_msg.data = self.action.flatten().tolist()
 
         # Proportional Controller
-        kp = 0.000008  # Adjust the proportional gain as needed
+        kp = 0.0000085  # Adjust the proportional gain as needed
         self.error = T.tensor(command_msg.data, dtype=T.float) - self.current_state
         proportional_output = kp * self.error
 
@@ -123,6 +125,13 @@ class SAC(Node):
         # Save the current error for the next iteration
         self.previous_error = self.error.clone().detach()
 
+
+
+
+
+
+
+
     def y_callback(self,msg):
         
         orientation_data = msg.data[42:46]  # Assuming orientation data is in msg.data[42:46]
@@ -133,35 +142,63 @@ class SAC(Node):
 
         
 
-        if(self.reward<-14000):
+        if(self.reward<-1):
             self.reward=0
-            self.agent.save_models()
-            
-        #if linear_acc.z<7, reduce rewards
-        if(msg.data[38]<8.5):
-            self.reward-=1.4
+    
 
-        if (any(value > 8 for value in msg.data[12:23]) and self.iteration != 100000):
-            self.reward -=5
-        
-   
+#----------------------------------------------------------------------------------
 
-        if(msg.data[36]>2 and msg.data[36]<15):
-          self.reward+=1
 
-        if(msg.data[36]>5 and msg.data[36]<15):
-          self.reward+=3
-        
         #if orientation rewards for pitch
         if(euler_angles[1]>=0 and euler_angles[1]<=0.6 or (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or (euler_angles[2]<=3 and euler_angles[2]>=2.3))):
             self.reward+=1
         else:
-            self.reward-=0.1
+            self.reward-=0.001
 
+ #-------------------------------------------------------------------
+
+        #if linear_acc.z<7, reduce rewards
+        if(msg.data[38]<8.5 or msg.data[38]>-8.5):
+            self.reward-=1
+  
+    
+          
+
+        #if linear_acc.x and linear.acc.y too high, reduce rewards
+        if(msg.data[36]>20 or msg.data[37]>20 or msg.data[37]<-20 or msg.data[36]<-20):
+            self.reward-=1
+
+        
+
+        #penalize high angular velocity
+        if(msg.data[39]>10 or msg.data[40]>10 or msg.data[41]>10):
+            self.reward-=1
+
+#--------------------------------------------------------------------------------------
+
+
+
+        if(msg.data[46]>0.7 and msg.data[46]<25):
+            self.reward+=1
+            #(0.5*msg.data[46])
+        else:
+            self.reward-=0.001
+     
+#--------------------------------------------------------------------------------
+        # if(self.reward>10):
+        #     self.reward+=(0.1*msg.data[47])
+
+
+#------------------------------------------------------------------------------------
+
+        if (any(value > 15 for value in msg.data[12:23]) and self.iteration != 100000):
+            self.reward -=0.1
+        
+        
         #reward for lidar distances
-        if (sum(value < 100.0 for value in msg.data[46:227])<=17 and sum(value < 100.0 for value in msg.data[46:227]) >=1):
+        if (sum(value < 100.0 for value in msg.data[48:228])<=17 and sum(value < 100.0 for value in msg.data[48:228]) >=1):
             self.pole = True
-            self.pole_values = [value for value in msg.data[46:227] if value < 12.0]
+            self.pole_values = [value for value in msg.data[48:228] if value < 12.0]
 
         else:
             self.pole=False
@@ -169,87 +206,30 @@ class SAC(Node):
         if(self.pole==True):
             self.reward+=(3*1/(sum(self.pole_values)+1))
       
-
-
         
-        if((self.pole==False and msg.data[46:227]==100.0 and msg.data[36]>1.6)):
+        if((self.pole==False and msg.data[48:228]==100.0 and msg.data[46]>0.5)):
             self.reward+=1.2
 
+        # if(self.pole==False and msg.data[46]>2):
+        #     msg_array = np.array(msg.data[48:228])
+        #     previous_array = np.array(self.previous_lidar_data)
 
-        #penalize high angular velocity
-        if(msg.data[39]>7 or msg.data[40]>7 or msg.data[41]>7):
-            self.reward-=5
-        
-    
+        #     # Perform element-wise subtraction
+        #     self.x = np.sum(msg_array - previous_array)
 
-        
-        #if linear_acc.x and linear.acc.y<1, reduce rewards
-        if(msg.data[36]<2.0 and msg.data[37]<2.0):
-            self.reward-=0.1
-      
-          
+        #     # Update previous_lidar_data
+        #     self.previous_lidar_data = msg.data[48:228]
 
-        #if linear_acc.x and linear.acc.y too high, reduce rewards
-        if(msg.data[36]>25 or msg.data[37]>25):
-            self.reward-=5
+        #     # Update reward
+        #     if self.x != 0:  # Avoid division by zero
+        #         self.reward += 0.2 * (1 / self.x + 0.1)
 
-        
-        
-     
-
+    #-----------------------------------------------------------------------------    
+         
         if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-            and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-            and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-            and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-            and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-            and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-            and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-            and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-            and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-            and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-            and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-            and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-            and (msg.data[36]>0.4)):
-              self.reward+=1
-
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
+           and (msg.data[6]>=-0.4 and  msg.data[6]<=0.7) 
            and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-
-           and (msg.data[36]>1.0 )):
-             self.reward+=2
-
- 
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-
-           and (msg.data[36]>3.0 )):
-             self.reward+=5
-
-             
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
+           and (msg.data[9]>=-0.4 and  msg.data[9]<=0.7)
            and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
            and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
            and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
@@ -264,34 +244,17 @@ class SAC(Node):
           ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
            (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
 
-           and (msg.data[36]>8.0 )):
-             self.reward+=30
+           and (msg.data[46]<20.0 and msg.data[46]>0.5 )):
+             self.reward+=0.3
+        
+        else:
+            self.reward-=0.001   
 
-      
-
-        if((msg.data[0]>=0.2 and  msg.data[0]<=0.4) 
-           and (msg.data[6]>=0.2 and  msg.data[0]<=0.4)
-           and (msg.data[3]>=0.2 and  msg.data[3]<=0.4)
-           and (msg.data[9]>=0.2 and  msg.data[3]<=0.4)
-           and (msg.data[1]>=1.0 and  msg.data[1]<=1.4)
-           and (msg.data[4]>=1.0  and  msg.data[4]<=1.4)
-           and (msg.data[7]>=1.0  and  msg.data[7]<=1.4)
-           and (msg.data[10]>=1.0  and msg.data[10]<=1.4)
-           and (msg.data[2]>=1.2 and  msg.data[2]<=1.6)
-           and (msg.data[5]>=1.2 and  msg.data[5]<=1.6)
-           and (msg.data[8]>=1.2 and  msg.data[8]<=1.6)
-           and (msg.data[11]>=1.2 and msg.data[11]<=1.6)
-
-           and (euler_angles[1]>=0 and euler_angles[1]<=0.6 or 
-          (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and 
-          ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
-           (euler_angles[2]<=3 and euler_angles[2]>=2.3)))):
-                self.reward+=0.2
-
+       
         if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
+           and (msg.data[6]>=-0.4 and  msg.data[6]<=0.7) 
            and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
+           and (msg.data[9]>=-0.4 and  msg.data[9]<=0.7)
            and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
            and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
            and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
@@ -306,87 +269,37 @@ class SAC(Node):
           ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
            (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
 
-           and (msg.data[36]>7.0 )):
-             self.reward+=10
-
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-
-           and (euler_angles[1]>=0 and euler_angles[1]<=0.6 or 
-          (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and 
-          ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
-           (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
-
-           and (msg.data[36]>3 )):
-             self.reward+=5
-
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
-
-           and (euler_angles[1]>=0 and euler_angles[1]<=0.6 or 
-          (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and 
-          ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
-           (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
-
-           and (msg.data[36]>1)):
+           and (msg.data[46]>2.0 and msg.data[46]<20)):
              self.reward+=1
 
-        if((msg.data[0]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[6]>=-0.4 and  msg.data[0]<=0.7) 
-           and (msg.data[3]>=-0.4 and  msg.data[3]<=0.) 
-           and (msg.data[9]>=-0.4 and  msg.data[3]<=0.7)
-           and (msg.data[1]>=0.2 and  msg.data[1]<=2.2)
-           and (msg.data[4]>=0.2 and  msg.data[4]<=2.2)
-           and (msg.data[7]>=0.2 and  msg.data[7]<=2.2)
-           and (msg.data[10]>=0.2 and msg.data[10]<=2.2)
-           and (msg.data[2]>=0.5 and  msg.data[2]<=2.0)
-           and (msg.data[5]>=0.5 and  msg.data[5]<=2.0)
-           and (msg.data[8]>=0.5 and  msg.data[8]<=2.0)
-           and (msg.data[11]>=0.5 and msg.data[11]<=2.0)
+       
+      
 
-           and (euler_angles[1]>=0 and euler_angles[1]<=0.6 or 
-          (euler_angles[1]<=0 and euler_angles[1]>=-0.4) and 
-          ((euler_angles[2]>=-3 and euler_angles[2]<=-2.3) or 
-           (euler_angles[2]<=3 and euler_angles[2]>=2.3)))
-
-           and (msg.data[36]<0.8)):
-             self.reward-=0.1
 
         
-
+#----------------------------------------------------------------------------------------
             
        
         self.next_state = msg.data
         current_time = time.time()
         if current_time - self.last_print_time >= 5.0:
             #self.get_logger().info('Combined Sensor Data state data: %s' % self.current_state)
-            self.get_logger().info('state values: %s' % msg.data[0:45])
-            self.get_logger().info('Action values: %s' % self.action)
-            self.get_logger().info('Reward values: %s' % self.reward)
-            self.get_logger().info('Iteration values: %s' % self.iteration)
+            # self.get_logger().info('state values: %s' % msg.data[0:45])
+            self.get_logger().info('State values: %s' % self.next_state[0:12])
+            
+            self.get_logger().info('Action Values:%s' %self.action)
+            
             self.get_logger().info('Session_info: %s' % self.new_session)
-            self.get_logger().info('actor loss: %s' % self.agent.a_loss)
-            self.get_logger().info('critic loss: %s' % self.agent.c_loss)
+            if (isinstance(self.agent.a_loss, T.Tensor)and isinstance(self.agent.c_loss, T.Tensor)):
+             self.get_logger().info('Actor loss: %s' % self.agent.a_loss.item())
+             self.get_logger().info('Critic loss: %s' % self.agent.c_loss.item())
+            else:
+             self.get_logger().info('Actor loss: %s' % self.agent.a_loss)
+             self.get_logger().info('Critic loss: %s' % self.agent.c_loss)
+            self.get_logger().info('Reward values: %s' % self.reward)
+            self.get_logger().info('Velocity:%s' %msg.data[46])
+            self.get_logger().info('Iteration values: %s' % self.iteration)
+             
             
       
             self.last_print_time = current_time
@@ -409,16 +322,17 @@ class SAC(Node):
 
 
 class Agent():
-    def __init__(self, alpha=0.00005, beta=0.00007,input_dims=[226],
-            env=None, gamma=0.75, n_actions=12, max_size=5000000, tau=0.005,
-            layer1_size=256, layer2_size=256, batch_size=512, reward_scale=1):
+    def __init__(self, alpha=0.0001, beta=0.0001,input_dims=[228],
+            env=None, gamma=0.97, n_actions=12, max_size=5000000, tau=0.005,
+            layer1_size=256, layer2_size=256, batch_size=512, reward_scale=7):
         self.gamma = gamma
         self.tau = tau
         self.memory = ReplayBuffer(max_size, input_dims, n_actions)
         self.batch_size = batch_size
         self.n_actions = n_actions
-        self.c_loss=0
-        self.a_loss=0
+        self.c_loss=0.0
+        self.a_loss=0.0
+      
 
         self.actor = ActorNetwork(alpha, input_dims, n_actions=n_actions,
                     name='actor')
@@ -440,16 +354,21 @@ class Agent():
 
         actions, _ = self.actor.sample_normal(state, reparameterize=False)
 
-        lower_limits = T.tensor([[-1.57, -1.0, 0.45, -1.57, -1.0, 0.45, -1.57, -1.0, 0.45, -1.57, -1.0, 0.45]])
+        lower_limits = T.tensor([[-1.57, -1.2, 0.45, -1.57, -1.2, 0.45, -1.57, -1.2, 0.45, -1.57, -1.2, 0.45]])
         upper_limits = T.tensor([[1.57, 3.14, 2.35, 1.57, 3.14, 2.35, 1.57, 3.14, 2.35, 1.57, 3.14, 2.35]])
 
         # Move the limits tensors to the same device as actions
         lower_limits = lower_limits.to(actions.device)
         upper_limits = upper_limits.to(actions.device)
 
-        # actions = T.tanh(actions)
-        # actions = T.clamp(actions, -1.57, 3.14)
-        actions = actions * (upper_limits - lower_limits) / 2.0 + (upper_limits + lower_limits) / 2.0
+        for i in range(actions.size(0)):
+        # Scale each joint independently while respecting the specified limits
+         actions[i] = (((actions[i] + 1) * (upper_limits[0, i] - lower_limits[0, i])) / 2 + lower_limits[0, i])
+        #actions = T.max(T.min(actions, upper_limits), lower_limits)
+
+        
+
+        #tions = actions * (upper_limits - lower_limits) / 2.0 + (upper_limits + lower_limits) / 2.0
         return actions.cpu().detach().numpy()
 
     def remember(self, state, action, reward, new_state, done):
@@ -742,7 +661,7 @@ class ValueNetwork(nn.Module):
         self.load_state_dict(T.load(self.checkpoint_file))
 
 class ActorNetwork(nn.Module):
-    def __init__(self, alpha, input_dims , fc1_dims=512, fc2_dims=512,fc3_dims=512,
+    def __init__(self, alpha , input_dims , fc1_dims=512, fc2_dims=512,fc3_dims=512,
             fc4_dims=512,fc5_dims=512,fc6_dims=512,fc7_dims=512,fc8_dims=512,
             fc9_dims=512,fc10_dims=512, n_actions=12, name='actor', 
             chkpt_dir='/home/param/new_ws/src/p5/src/sac_10layer'):
@@ -758,6 +677,7 @@ class ActorNetwork(nn.Module):
         self.fc8_dims = fc8_dims
         self.fc9_dims = fc9_dims
         self.fc10_dims = fc10_dims
+    
 
         self.n_actions = n_actions
         self.name = name
@@ -811,8 +731,9 @@ class ActorNetwork(nn.Module):
         mu = self.mu(prob)
         sigma = self.sigma(prob)
 
-        # sigma = T.exp(sigma) + 1e-5  # Add a small positive value to avoid values close to zero
+        #sigma = T.exp(sigma) + 1e-5  # Add a small positive value to avoid values close to zero
         # sigma = T.clamp(sigma, min=-1, max=2)
+
         sigma = T.clamp(sigma, min=self.reparam_noise, max=1)
 
      
@@ -828,6 +749,7 @@ class ActorNetwork(nn.Module):
             actions = probabilities.sample()
 
         action = T.tanh(actions).to(self.device)
+
         log_probs = probabilities.log_prob(actions)
         log_probs -= T.log(1-action.pow(2)+self.reparam_noise)
         log_probs = log_probs.sum(-1, keepdim=True)

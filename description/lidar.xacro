@@ -1,6 +1,15 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
 
+    <xacro:macro name="inertial_sphere" params="mass radius *origin">
+        <inertial>
+            <xacro:insert_block name="origin"/>
+            <mass value="${mass}" />
+            <inertia ixx="${(2/5) * mass * (radius*radius)}" ixy="0.0" ixz="0.0"
+                    iyy="${(2/5) * mass * (radius*radius)}" iyz="0.0"
+                    izz="${(2/5) * mass * (radius*radius)}" />
+        </inertial>
+    </xacro:macro>  
 
 
     <xacro:macro name="inertial_cylinder" params="mass length radius *origin">
@@ -13,27 +22,31 @@
         </inertial>
     </xacro:macro>
 
+
+
     <joint name="laser_joint" type="fixed">
         <parent link="base_link"/>
         <child link="laser_frame"/>
-        <origin xyz="0.10 0 0.1" rpy="0 0 0"/>
+        <origin xyz="0.0 0 0.05" rpy="0 0 0"/>
     </joint>
 
     <link name="laser_frame">
         <visual>
+            
             <geometry>
-                <cylinder radius="0.03" length="0.07"/>
+                <cylinder radius="0.01" length="0.04"/>
             </geometry>
             <material name="black"/>
         </visual>
      
         <collision>
+          
             <geometry>
-                <origin xyz="0.03 0.03 0.03" rpy="0 0 0"/>
-                <cylinder radius="0.03" length="0.07"/>
+               
+                <cylinder radius="0.01" length="0.04"/>
             </geometry>
         </collision>
-        <xacro:inertial_cylinder mass="0.1" length="0.04" radius="0.05">
+        <xacro:inertial_cylinder mass="0.1" length="0.04" radius="0.1">
             <origin xyz="0 0 0" rpy="0 0 0"/>
         </xacro:inertial_cylinder>
     </link>
@@ -57,7 +70,7 @@
                 </scan>
                 <range>
                     <min>0.3</min>
-                    <max>12</max>
+                    <max>3</max>
                 </range>
             </ray>
             <plugin name="laser_controller" filename="libgazebo_ros_ray_sensor.so">
@@ -68,6 +81,218 @@
                 <frame_name>laser_frame</frame_name>
             </plugin>
         </sensor>
-    </gazebo>
+    </gazebo> 
+
+
+
+
+
+
+<!-- 
+
+
+
+
+    <joint name="x_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="x_frame"/>
+        <origin xyz="0.10 0.05 0.07" rpy="0 0 0"/>
+    </joint>
+
+    <link name="x_frame">
+        <visual>
+            <origin xyz="0.0 0.05 0.06" rpy="0 0 0"/>     
+            <geometry>
+                <cylinder radius="0.008" length="0.14"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+     
+        <collision>
+            <origin xyz="0.0 0.05 0.06" rpy="0 0 0"/>     
+            <geometry>
+               
+                <cylinder radius="0.008" length="0.14"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="0.1" radius="0.008" length="0.14">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
+
+
+
+
+
+
+
+
+
+
+
+    <joint name="y_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="y_frame"/>
+        <origin xyz="0.10 -0.05 0.07" rpy="0 0 0"/>
+    </joint>
+
+
+    <link name="y_frame">
+        <visual>
+            <origin xyz="0.0 -0.05 0.06" rpy="0 0 0"/>     
+            <geometry>
+                <cylinder radius="0.008" length="0.14"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+     
+        <collision>
+            <origin xyz="0.0 -0.05 0.06" rpy="0 0 0"/>     
+            <geometry>
+               
+                <cylinder radius="0.008" length="0.14"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="0.1" radius="0.008" length="0.14">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
+
+
+
+
+
+
+
+
+
+
+    <joint name="z_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="z_frame"/>
+        <origin xyz="-0.06 -0.05 0.07" rpy="0 0 0"/>
+    </joint>
+
+
+    <link name="z_frame">
+        <visual>
+            <origin xyz="-0.060 -0.05 0.06" rpy="0 0 0"/>     
+            <geometry>
+                <cylinder radius="0.008" length="0.14"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+     
+        <collision>
+            <origin xyz="-0.060 -0.05 0.06" rpy="0 0 0"/>     
+            <geometry>
+               
+                <cylinder radius="0.08" length="0.14"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="0.1" radius="0.008" length="0.14">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
+
+
+
+
+
+
+
+
+
+
+    <joint name="w_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="w_frame"/>
+        <origin xyz="-0.060 0.05 0.07" rpy="0 0 0"/>
+    </joint>
+
+    <link name="w_frame">
+        <visual>
+            <origin xyz="-0.060 0.05 0.06" rpy="0 0 0"/>     
+            <geometry>
+                <cylinder radius="0.008" length="0.14"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+     
+        <collision>
+            <origin xyz="-0.060 0.05 0.06" rpy="0 0 0"/>     
+            <geometry>
+               
+                <cylinder radius="0.008" length="0.14"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="0.1" radius="0.008" length="0.14">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>  -->
+
+
+<!-- 
+    <joint name="a_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="a_frame"/>
+        <origin xyz="0 0.04 0.06" rpy="0 0 0"/>
+    </joint>
+
+    <link name="a_frame">
+        <visual>
+            <origin xyz="0 0.04 0.06" rpy="0 0 0"/>     
+            <geometry>
+                <cylinder radius="0.009" length="0.15"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+     
+        <collision>
+            <origin xyz="0 0.04 0.06" rpy="0 0 0"/>     
+            <geometry>
+               
+                <cylinder radius="0.009" length="0.15"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="0.3" radius="0.005" length="0.1">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
+
+
+
+    <joint name="b_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="b_frame"/>
+        <origin xyz="0 -0.04 0.06" rpy="0 0 0"/>
+    </joint>
+
+    <link name="b_frame">
+        <visual>
+            <origin xyz="0 -0.04 0.06" rpy="0 0 0"/>     
+            <geometry>
+                <cylinder radius="0.009" length="0.15"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+     
+        <collision>
+            <origin xyz="0 -0.04 0.05" rpy="0 0 0"/>     
+            <geometry>
+               
+                <cylinder radius="0.009" length="0.15"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="0.3" radius="0.005" length="0.1">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link> -->
+
+
+
+
+
+
 
 </robot>

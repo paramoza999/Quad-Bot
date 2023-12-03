@@ -477,7 +477,7 @@ class SAC(Node):
 
 
 class Agent():
-    def __init__(self, alpha=0.00005, beta=0.00007,input_dims=[226],
+    def __init__(self, alpha=0.00005, beta=0.00007,input_dims=[228],
             env=None, gamma=0.69, n_actions=12, max_size=1000000, tau=0.005,
             layer1_size=256, layer2_size=256, batch_size=512, reward_scale=1.0):
         self.gamma = gamma

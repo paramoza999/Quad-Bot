@@ -11,15 +11,10 @@
 
 
     <!-- ****************   INCLUDES OTHER FILES  ******************* -->
-    <!-- <xacro:include filename="gazebo_ros2_control_plugin.xacro" />  -->
+    <xacro:include filename="gazebo_ros2_control_plugin.xacro" /> 
     <xacro:include filename="hyperdog_gazebo.xacro" />
-    <xacro:include filename="gazebo_ros2_control_plugin.xacro" />
-  
 
     <xacro:include filename="lidar.xacro"/>
-
-
-
 
 
 </robot>

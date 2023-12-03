@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:arg name="imu_visual"    default="false"/>
-    <xacro:arg name="camera_visual" default="false"/>
 <!--
     _____________________________________________________________________
         include this file into: /description/hyperdog.urdf.xacro 
@@ -13,8 +12,6 @@
 -->
 
     <xacro:include filename="physics.xacro" /> 
-
-
     <gazebo reference="imu_link">
         <sensor type="imu" name="imu">
           <always_on>true</always_on>
@@ -43,13 +40,6 @@
           <pose>0 0 0 0 0 0</pose>
         </sensor>
     </gazebo>
-
-
-
-
-
-
-
 
     <xacro:macro name="gz_hip">
         <mu1>0.2</mu1>

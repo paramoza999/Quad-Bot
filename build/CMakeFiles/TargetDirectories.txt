@@ -1,0 +1,9 @@
+/home/param/new_ws/src/p5/build/CMakeFiles/uninstall.dir
+/home/param/new_ws/src/p5/build/CMakeFiles/p5_uninstall.dir
+/home/param/new_ws/src/p5/build/CMakeFiles/test.dir
+/home/param/new_ws/src/p5/build/CMakeFiles/edit_cache.dir
+/home/param/new_ws/src/p5/build/CMakeFiles/rebuild_cache.dir
+/home/param/new_ws/src/p5/build/CMakeFiles/list_install_components.dir
+/home/param/new_ws/src/p5/build/CMakeFiles/install.dir
+/home/param/new_ws/src/p5/build/CMakeFiles/install/local.dir
+/home/param/new_ws/src/p5/build/CMakeFiles/install/strip.dir
