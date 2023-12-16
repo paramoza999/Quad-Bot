@@ -31,8 +31,7 @@ them well-suited for applications such as search and rescue operations.One of th
 of our solution is the mitigation of risks associated with direct experimentation on physical robots.
 Allowing robots to learn and optimize control policies in simulation empowers them to adapt to
 unforeseen challenges in real-world scenarios.
-∗https://github.com/paramoza999/Quad-Bot
-QuadBot
+
 
 
 [Qaud-Bot-Readme.pdf](https://github.com/paramoza999/Quad-Bot/files/13693527/Qaud-Bot-Readme.pdf)
