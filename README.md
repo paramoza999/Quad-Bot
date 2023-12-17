@@ -19,6 +19,6 @@ simulation, as real hardware is susceptible to damage when training the model in
 quadruped robot control, addressing challenges posed by real-world complexities and advancing autonomous robotic systems.
 
 
+[Qaud-Bot-Readme_3.pdf](https://github.com/paramoza999/Quad-Bot/files/13696887/Qaud-Bot-Readme_3.pdf)
 
 
-[Qaud-Bot-Readme.pdf](https://github.com/paramoza999/Quad-Bot/files/13693527/Qaud-Bot-Readme.pdf)
