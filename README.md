@@ -3,6 +3,13 @@ To Start Training the model, First load the robot in gazebo using l2.py launch f
 
 ![image](https://github.com/paramoza999/Quad-Bot/assets/67379787/da53a4f0-fec5-4c9c-b9aa-ead82050b97e)
 
+Figure 1: Control Architecture
+
+
+
+![image](https://github.com/paramoza999/Quad-Bot/assets/67379787/827087e1-b45f-4a16-ace4-be27b727c0b6)
+Figure 2: Ros2-Gazebo Communication Structure
+
 This project tackles the complex task of controlling a quadruped robot using
 model-free reinforcement learning (MFRL) within the ROS2 and Gazebo
 simulation environment. Quadruped robots are versatile but face challenges
