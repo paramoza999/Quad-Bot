@@ -15,26 +15,9 @@ Gazebo offers a realistic simulation environment. This approach enhances
 adaptability and autonomy, crucial for applications like search and rescue.The
 significance lies in mitigating risks associated with direct experimentation on
 physical robots. By allowing robots to learn and optimize control policies in
-simulation, our approach empowers them to adapt to unforeseen challenges
-in real-world scenarios. This project introduced an alternative solution for
-quadruped robot control, addressing challenges posed by real-world complex-
-ities and advancing autonomous robotic systems.
-1 Introduction
-In the rapidly evolving field of Artificial Intelligence (AI), the intersection of planning and learning
-methods is crucial for developing intelligent systems capable of adapting to complex environments.
-This project, focuses on addressing challenges in controlling quadruped robots using model-free
-reinforcement learning (MFRL) within the ROS2 and Gazebo simulation environment.Quadruped
-robots [1], known for their versatility, encounter difficulties in adapting to dynamic environments.
-The intricacies of designing robust control systems for such robots in dynamic settings necessitate
-innovative approaches. Our project aims to integrate MFRL with the ROS2 and Gazebo platforms,
-providing an efficient framework for testing and deploying learned policies onto physical robots.The
-combination of ROS2 and Gazebo serves as a vital bridge between simulation and real-world deploy-
-ment. ROS2 facilitates streamlined communication, while Gazebo provides a realistic simulation
-environment. This approach enhances the adaptability and autonomy of quadruped robots, making
-them well-suited for applications such as search and rescue operations.One of the key advantages
-of our solution is the mitigation of risks associated with direct experimentation on physical robots.
-Allowing robots to learn and optimize control policies in simulation empowers them to adapt to
-unforeseen challenges in real-world scenarios.
+simulation, as real hardware is susceptible to damage when training the model in a real robot. This project explores an alternative solution for
+quadruped robot control, addressing challenges posed by real-world complexities and advancing autonomous robotic systems.
+
 
 
 
