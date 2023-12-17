@@ -1,3 +1,7 @@
+To Start Training the model, First load the robot in gazebo using l2.py launch file, then start com.py for the current and next state data, then run the appropriate RL script.
+
+
+
 This project tackles the complex task of controlling a quadruped robot using
 model-free reinforcement learning (MFRL) within the ROS2 and Gazebo
 simulation environment. Quadruped robots are versatile but face challenges
